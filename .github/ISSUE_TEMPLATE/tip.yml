@@ -1,0 +1,21 @@
+name: Tip or trick
+description: Share something that saved you time.
+labels: [tip]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: The tip in one sentence
+    validations:
+      required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: When it helps, and how
+      description: The streams.json / config.json lines or the steps.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: APIC version you tried it with
