@@ -1,0 +1,4 @@
+# build output and IDE files never go into a sample
+out/
+.vs/
+*.user

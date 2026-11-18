@@ -20,11 +20,14 @@ A tip must work with a released APIC version. Say which version you tried it wit
 
 ## Samples
 
-A sample is a folder in `samples/` with:
+Each sample is its own folder `samples/<name>/` (lower case, words joined with `-`):
 
-- `README.md`: what it shows, what hardware it needs, how to run it;
-- the project folder (`config.json`, `Setups/streams.json`, `Models/`, `ICD/`, `CMakeLists.txt`);
-- no build output (`out/`), no recordings larger than a few MB, nothing you may not share.
+- `README.md`: what it shows, what hardware it needs, how to run it (copy one of the existing READMEs);
+- `project/`: the project folder (`config.json`, `Setups/streams.json`, `Models/`, `ICD/`, `CMakeLists.txt`);
+- no build output (`out/`, `.vs/`), no recordings larger than a few MB, nothing you may not share.
+
+When the pull request is merged, the workflow zips the folder and publishes it as the release `sample-<name>`
+(see [samples/README.md](samples/README.md)).
 
 ## Problem reports
 

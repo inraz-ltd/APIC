@@ -1,0 +1,53 @@
+# Makes the sample downloads: every folder samples/<name>/ whose project/ has files becomes
+# <name>.zip in the release "sample-<name>" (created the first time, the zip replaced after that).
+# The APIC Help Downloads page links to releases/download/sample-<name>/<name>.zip.
+name: Sample downloads
+
+on:
+  push:
+    branches: [main]
+    paths: ['samples/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sample-downloads
+  cancel-in-progress: false
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip each sample and publish it as its own release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          made=0
+          for dir in samples/*/; do
+            name=$(basename "$dir")
+            if [ ! -d "${dir}project" ] || [ -z "$(find "${dir}project" -type f ! -name .gitkeep -print -quit)" ]; then
+              echo "::notice::$name: project/ has no files yet, no download made"
+              continue
+            fi
+            tag="sample-$name"
+            zip="$RUNNER_TEMP/$name.zip"
+            rm -f "$zip"
+            (cd samples && zip -qr "$zip" "$name" -x "$name/project/.gitkeep")
+            title=$(head -n 1 "${dir}README.md" | sed 's/^# *//')
+            if gh release view "$tag" >/dev/null 2>&1; then
+              gh release upload "$tag" "$zip" --clobber
+              echo "::notice::$name: $tag updated"
+            else
+              gh release create "$tag" "$zip" --target "$GITHUB_SHA" \
+                --title "Sample: ${title:-$name}" \
+                --notes "Download $name.zip below. What it is and how to run it: samples/$name/README.md"
+              echo "::notice::$name: $tag created"
+            fi
+            made=$((made + 1))
+          done
+          echo "$made sample download(s) made"
